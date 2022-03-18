@@ -12,7 +12,7 @@ The dataset is available on [Google Drive](https://bit.ly/3nLP8YG).
 
 ## Detections Demo
 
-![detections](https://drive.google.com/file/d/1AuLecax5tPF61JfiTGRxsTI5qo8RiOOR/view)
+![detections](https://user-images.githubusercontent.com/31284778/159072214-4c11bbe1-e6c8-421e-a67f-148215db1623.mp4)
 
 ## Tools Available
 
