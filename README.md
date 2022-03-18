@@ -10,6 +10,10 @@ The dataset is available on [Google Drive](https://bit.ly/3nLP8YG).
 - Although the images had varying dimensions, we standardized them to 768x480 pixels.
 - Image annotations are available both in PASCAL VOC-YOLO and COCO formats.
 
+## Detections Demo
+
+![detections](https://drive.google.com/file/d/1AuLecax5tPF61JfiTGRxsTI5qo8RiOOR/view)
+
 ## Tools Available
 
 - TODO
