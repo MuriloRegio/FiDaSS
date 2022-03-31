@@ -65,6 +65,7 @@ val_obj   = deepcopy(obj_template)
 test_obj  = deepcopy(obj_template)
 
 
+def main():
 for obj, split in zip([train_obj, val_obj, test_obj], ["splits/tiny-training-C1.txt", "splits/tiny-validation.txt", "splits/tiny-test.txt"]):
     with open(split, "r") as infile:
         files = [os.path.basename(file).replace('.jpg','.txt') for file in infile.read().split("\n")]
@@ -122,11 +123,11 @@ for obj, split in zip([train_obj, val_obj, test_obj], ["splits/tiny-training-C1.
                 # exit(0)
 
 
-with open("train.json", "w") as outfile:
-    json.dump(train_obj, outfile)
+    with open("train.json", "w") as outfile:
+        json.dump(train_obj, outfile)
 
-with open("test.json", "w") as outfile:
-    json.dump(test_obj, outfile)
+    with open("test.json", "w") as outfile:
+        json.dump(test_obj, outfile)
 
-with open("val.json", "w") as outfile:
-    json.dump(val_obj, outfile)
+    with open("val.json", "w") as outfile:
+        json.dump(val_obj, outfile)

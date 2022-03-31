@@ -3,13 +3,13 @@ from glob import glob
 import random
 random.seed(42)
 
-folder = 'Final/selected_labels'
-folder = 'Final/negatives'
-isNeg = True
+# folder = 'Final/selected_labels'
+# folder = 'Final/negatives'
+# isNeg = True
 
 
 
-def mksplits(folder, isNeg):
+def main(folder, isNeg):
 	if isNeg:
 		files = glob(os.path.join(folder, '*'))
 		key = '_neg'
@@ -88,4 +88,18 @@ def mksplits(folder, isNeg):
 			)
 
 
-mksplits(folder, isNeg)
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="TODO")
+
+    parser.add_argument('input', type=str,
+                help='TODO.')
+
+
+    parser.add_argument('isNeg', type=str,
+                help='TODO.')
+
+
+    args = parser.parse_args()
+    main(args.input, args.isNeg)

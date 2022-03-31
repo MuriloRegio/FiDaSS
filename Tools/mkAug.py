@@ -200,7 +200,29 @@ def process(directory):
 
 
 
-dirs = [d.replace('images', '').replace('labels', '') for d in DIRS]
-[process(d) for d in dirs]
-print (COUNT[0])
+def main("TODO"):
+	dirs = [d.replace('images', '').replace('labels', '') for d in DIRS]
+	[process(d) for d in dirs]
+	print (COUNT[0])
 
+if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser(description="TODO")
+
+    parser.add_argument('input', type=str, nargs='+',
+                help='TODO.')
+
+
+    parser.add_argument('Ioutput', type=str,
+                help='TODO.')
+
+    parser.add_argument('Loutput', type=str,
+                help='TODO.')
+
+    parser.add_argument('transforms', type=int, nargs='+',
+                help='TODO.')
+
+
+    args = parser.parse_args()
+    main(args.input, args.Ioutput, args.Loutput, args.transforms)

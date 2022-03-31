@@ -1,19 +1,29 @@
 import os
-from glob import glob
+import json
+from glob import globs
 
-folder= 'Final/selected_labels'
-folder= 'Final/AUG_ANNOT'
+def main(folder):
+	files = glob(os.path.join(folder, '*.txt'))
 
-files = glob(os.path.join(folder, '*.txt'))
+	data = {}
 
-data = {}
+	for file in files:
+		with open(file, 'r') as infile:
+			amt = len(infile.readlines())
+		
+		if amt not in data:
+			data[amt] = 0
+		data[amt]+= 1
 
-for file in files:
-	with open(file, 'r') as infile:
-		amt = len(infile.readlines())
-	
-	if amt not in data:
-		data[amt] = 0
-	data[amt]+= 1
+	print (json.dumps(data, indent=4))
 
-print (data)
+if __name__ == '__main__':
+	import argparse
+
+	parser = argparse.ArgumentParser(description="Prints a list of numbers of objects per image.")
+
+	parser.add_argument('path', type=str,
+	            help='Relative path to the folder containing labels.')
+
+	args = parser.parse_args()
+	main(args.path)
