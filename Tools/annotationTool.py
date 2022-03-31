@@ -9,17 +9,19 @@ drawing = False
 done = False
 moving = False
 
+disp_size = (960,480)
+
+def draw(rect, x=None, y=None):
+	image = img.copy()
+	if rect:
+		cv2.rectangle(image, points[0], points[1], (0, 255, 0), 2)
+	else:
+		cv2.line(image, (0, y), (disp_size[0], y), (100, 100, 100), 1)
+		cv2.line(image, (x, 0), (x, disp_size[1]), (100, 100, 100), 1)
+
+	cv2.imshow("img", image)
 
 def drag(event, x, y, flags, param):
-	image = img.copy()
-	def draw(rect):
-		if rect:
-			cv2.rectangle(image, points[0], points[1], (0, 255, 0), 2)
-		else:
-			cv2.line(image, (0, y), (disp_size[0], y), (100, 100, 100), 1)
-			cv2.line(image, (x, 0), (x, disp_size[1]), (100, 100, 100), 1)
-
-		cv2.imshow("img", image)
 
 	global points, drawing, done, moving
 
@@ -29,7 +31,7 @@ def drag(event, x, y, flags, param):
 		done = False
 
 	if event == 0 and not done and not drawing: ## show perpendicular lines
-		draw(False)
+		draw(False, x, y)
 
 	if event == 0 and drawing: ## dragging the mouse
 		points[-1] = (x, y)
@@ -39,20 +41,9 @@ def drag(event, x, y, flags, param):
 		hw = int(w/2)
 		hh = int(h/2)
 
-		check = [
-			(
-				min(img.shape[1], x+hw),
-				min(img.shape[0], y+hh)
-			),
-			(
-				max(0, x-hw),
-				max(0, y-hh)
-			)
-		]
 		tmp = [(x+hw, y+hh), (x-hw, y-hh)]
 
-		if tmp == check:
-			points = tmp[:]
+		points = tmp[:]
 		draw(True)
 
 
@@ -72,16 +63,31 @@ def drag(event, x, y, flags, param):
 
 
 def convert(size, box):
+	global points
+	check_x = lambda x : max(0, min(size[0], x))
+	check_y = lambda y : max(0, min(size[1], y))
+
+	newbox = [
+		check_x(box[0]),
+		check_y(box[1]),
+		check_x(box[2]),
+		check_y(box[3]),
+	]
+
+	points = [(newbox[0], newbox[1]), (newbox[2], newbox[3])]
+	draw(True)
+
 	dw = 1./size[0]
 	dh = 1./size[1]
-	x = (box[0] + box[2])/2.0
-	y = (box[1] + box[3])/2.0
-	w = box[2] - box[0]
-	h = box[3] - box[1]
+	x = (newbox[0] + newbox[2])/2.0
+	y = (newbox[1] + newbox[3])/2.0
+	w = newbox[2] - newbox[0]
+	h = newbox[3] - newbox[1]
 	x = abs(x*dw)
 	w = abs(w*dw)
 	y = abs(y*dh)
 	h = abs(h*dh)
+
 	return [x,y,w,h]
 
 
@@ -132,8 +138,9 @@ def loadCheckpoint(checkpointFile, idxFile):
 
 
 def main(inputFolder, outputFolder, checkpointFile, idxFile):
-	disp_size = (960,480)
 	class_id  = 0
+
+	global img, done, points
 
 	if os.path.exists(idxFile) and os.path.exists(checkpointFile):
 		foo  = loadCheckpoint
@@ -153,13 +160,15 @@ def main(inputFolder, outputFolder, checkpointFile, idxFile):
 	momentum = 0
 
 	boxes = []
+	key   = None
 
 	while True:
 		img = cv2.imread(os.path.join(inputFolder, frames[idx]))
-		# img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 		img = cv2.resize(img, disp_size)
-		cv2.imshow('img', img)
-		#print(frames[idx], end='\r')
+
+		if key != ord('s'):
+			cv2.imshow('img', img)
+
 		print('{1:06d}/{0:06d}\t\t{2}'.format(amt, idx+1, frames[idx]), end='\r')
 
 		key = cv2.waitKey(0) & 0xff
@@ -178,6 +187,8 @@ def main(inputFolder, outputFolder, checkpointFile, idxFile):
 						)
 					)
 				boxes = []
+				
+				# sh.copy(os.path.join(inputFolder,frames[idx]), os.path.join(outputFolder, frames[idx]))
 
 		if key == ord('a'):
 			boxes = []
@@ -201,13 +212,11 @@ def main(inputFolder, outputFolder, checkpointFile, idxFile):
 		if key == ord('s') and done:
 			done = False
 			box = list(points[0])+list(points[1])
-			points = []
 			print (box)
 			boxes.append([str(x) for x in [class_id]+convert(disp_size, box)])
 						##c, x, y, w, h
+			points = []
 			
-
-			sh.copy(os.path.join(inputFolder,frames[idx]), os.path.join(outputFolder, frames[idx]))
 
 		if key == last_key:
 			momentum = min(momentum+1,100)
@@ -226,23 +235,34 @@ def main(inputFolder, outputFolder, checkpointFile, idxFile):
 if __name__ == "__main__":
 	import argparse
 
-	parser = argparse.ArgumentParser(description="Tool for annotating images with the specified labels.")
+	parser = argparse.ArgumentParser(description="Tool for annotating images with the specified labels."
+		"\n\nUsage:"
+		"\n\tLeft click + Drag -> Select area of interest"
+		"\n\tMiddle click + Drag -> Move the bounding box"
+		"\n\t's' key -> Save current bounding box"
+		"\n\t'w' key -> Write all saved bounding boxes for current image"
+		"\n\t'r' key -> Inverts RGB to BGR color space"
+		"\n\t'a' and 'd' keys -> Move to previous/next image"
+		"\n\t'q' key -> leave application"
+		"\nMoving to a new image erases all saved bounding boxes",
+		formatter_class=argparse.RawTextHelpFormatter
+	)
 
-	parser.add_argument('input_path', type=str,
+	parser.add_argument('--input_path', type=str,
 	            help='Relative path to the folder containing the images.')
 
 
-	parser.add_argument('output_path', type=str,
+	parser.add_argument('--output_path', type=str,
 	            help='Relative path to the folder where the labels will be written.')
 
 
-	parser.add_argument('idx', type=str, default='.idx.ckpt',
+	parser.add_argument('--idx', type=str, default='.idx.ckpt',
 	            help='File to write the last file analyzed, for continued usage after closing the application.')
 
 
-	parser.add_argument('checkpoint', type=str, default='.checkpoint.ckpt',
+	parser.add_argument('--checkpoint', type=str, default='.checkpoint.ckpt',
 	            help='File to write the checkpoint list, for continued usage after closing the application.')
 
 
 	args = parser.parse_args()
-	main(args.input, args.output, args.checkpoint, args.idx)
+	main(args.input_path, args.output_path, args.checkpoint, args.idx)
