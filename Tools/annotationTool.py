@@ -133,7 +133,7 @@ def loadCheckpoint(checkpointFile, idxFile):
 
 def main(inputFolder, outputFolder, checkpointFile, idxFile):
 	disp_size = (960,480)
-	class_id  = 1 
+	class_id  = 0
 
 	if os.path.exists(idxFile) and os.path.exists(checkpointFile):
 		foo  = loadCheckpoint
