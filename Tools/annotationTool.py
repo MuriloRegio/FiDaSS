@@ -236,11 +236,11 @@ if __name__ == "__main__":
 	            help='Relative path to the folder where the labels will be written.')
 
 
-	parser.add_argument('idx', type=str,
+	parser.add_argument('idx', type=str, default='.idx.ckpt',
 	            help='File to write the last file analyzed, for continued usage after closing the application.')
 
 
-	parser.add_argument('checkpoint', type=str,
+	parser.add_argument('checkpoint', type=str, default='.checkpoint.ckpt',
 	            help='File to write the checkpoint list, for continued usage after closing the application.')
 
 
