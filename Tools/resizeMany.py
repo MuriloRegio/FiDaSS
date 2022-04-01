@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Resizes a set of images to a standardized size.")
 
-    parser.add_argument('path', type=str,
+    parser.add_argument('path', type=str, required=True,
                 help='Relative path to the folder containing the images to be resized.')
 
     parser.add_argument('img_size', type=int, nargs='+', default=[768,480],

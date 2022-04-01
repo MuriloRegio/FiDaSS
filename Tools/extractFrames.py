@@ -41,18 +41,18 @@ if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser(description="Converts a set of videos to frames.\nSearches all sub-folders within the folder specified.")
 
-	parser.add_argument('videos_folder', type=str,
+	parser.add_argument('--videos_folder', type=str, required=True,
 	            help='Relative path to the folder containing the videos.')
 
 
-	parser.add_argument('frames_path', type=str,
+	parser.add_argument('--frames_path', type=str, required=True,
 	            help='Relative path to the folder where the frames will be saved.')
 
 
-	parser.add_argument('skip', type=int, default=1,
+	parser.add_argument('--skip', type=int, default=1,
 	            help='Number of frames to skip before saving each time.')
 
-	parser.add_argument('extensions', type=str, nargs='+', default=['webm', 'mp4'],
+	parser.add_argument('--extensions', type=str, nargs='+', default=['webm', 'mp4'],
 	            help='Video extensions to look for within the folder specified.')
 
 	args = parser.parse_args()

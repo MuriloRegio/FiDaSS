@@ -94,8 +94,6 @@ def convert(size, box):
 
 def mkCheckpointFile(checkpointFile, idxFile, inputFolder, outputFolder):
 	frames = os.listdir(inputFolder)
-	if not os.path.exists(outputFolder):
-		os.mkdir(outputFolder)
 
 	def order(x):
 		if '_' not in x:
@@ -139,6 +137,9 @@ def loadCheckpoint(checkpointFile, idxFile):
 
 def main(inputFolder, outputFolder, checkpointFile, idxFile):
 	class_id  = 0
+	
+	if not os.path.exists(outputFolder):
+		os.mkdir(outputFolder)
 
 	global img, done, points
 
@@ -248,11 +249,11 @@ if __name__ == "__main__":
 		formatter_class=argparse.RawTextHelpFormatter
 	)
 
-	parser.add_argument('--input_path', type=str,
+	parser.add_argument('--input_path', type=str, required=True,
 	            help='Relative path to the folder containing the images.')
 
 
-	parser.add_argument('--output_path', type=str,
+	parser.add_argument('--output_path', type=str, required=True,
 	            help='Relative path to the folder where the labels will be written.')
 
 

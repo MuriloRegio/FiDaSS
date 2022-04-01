@@ -20,13 +20,13 @@ if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser(description="Selects only the annotated frames within a larger collection and moves them to a new folder.")
 
-	parser.add_argument('img_folders', type=str, nargs="+",
+	parser.add_argument('--img_folders', type=str, nargs="+", required=True,
 	            help='Relative path to the folders containing the frames extracted.')
 
-	parser.add_argument('annots_folder', type=str,
+	parser.add_argument('--annots_folder', type=str, required=True,
 	            help='Relative path to the folder containing the annotations of the frames of interest.')
 
-	parser.add_argument('target_folder', type=str,
+	parser.add_argument('--target_folder', type=str, required=True,
 	            help='Relative path to the folder where all the annotated frames will be moved to.')
 
 	args = parser.parse_args()

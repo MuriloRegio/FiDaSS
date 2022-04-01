@@ -60,11 +60,11 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Fixes labels coordinates exceeding the limits of the image dimension.")
 
-    parser.add_argument('input_folder', type=str,
+    parser.add_argument('--input_folder', type=str, required=True,
                 help='Relative path to the directory containing annotations.')
 
 
-    parser.add_argument('output_folder', type=str,
+    parser.add_argument('--output_folder', type=str, required=True,
                 help='Relative path to the directory where the corrected annotations will be written.')
 
 

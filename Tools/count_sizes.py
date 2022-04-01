@@ -36,9 +36,9 @@ if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser(description="Prints a list of how much of the image each object occupies.")
 
-	parser.add_argument('path', type=str,
+	parser.add_argument('--path', type=str, required=True,
 	            help='Relative path to the folder containing the labels.')
 
 
 	args = parser.parse_args()
-	main(args.input)
+	main(args.path)

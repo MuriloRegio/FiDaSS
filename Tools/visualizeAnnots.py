@@ -1,4 +1,5 @@
 import shutil as sh
+import pickle
 import cv2
 import os
 
@@ -132,21 +133,37 @@ if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser(description="TODO")
 
-	parser.add_argument('input', type=str,
+	parser.add_argument('--images', type=str, required=True,
+	            help='Relative path to the folder containing the images.')
+
+
+	parser.add_argument('--labels', type=str, required=True,
 	            help='TODO.')
 
 
-	parser.add_argument('labels', type=str,
-	            help='TODO.')
+	# parser.add_argument('--idx', type=str,
+	#             help='TODO.')
 
 
-	parser.add_argument('idx', type=str,
-	            help='TODO.')
+	# parser.add_argument('--checkpoint', type=str,
+	#             help='TODO.')
+
+	# parser.add_argument('--input_path', type=str, required=True,
+	#             help='Relative path to the folder containing the images.')
 
 
-	parser.add_argument('checkpoint', type=str,
-	            help='TODO.')
+	# parser.add_argument('--output_path', type=str, required=True,
+	#             help='Relative path to the folder where the labels will be written.')
+
+
+	parser.add_argument('--idx', type=str, default='.idx.ckpt',
+	            help='File to write the last file analyzed, for continued usage after closing the application.')
+
+
+	parser.add_argument('--checkpoint', type=str, default='.checkpoint.ckpt',
+	            help='File to write the checkpoint list, for continued usage after closing the application.')
+
 
 
 	args = parser.parse_args()
-	main(args.input, args.labels, args.checkpoint, args.idx)
+	main(args.images, args.labels, args.checkpoint, args.idx)

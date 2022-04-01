@@ -93,11 +93,11 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="TODO")
 
-    parser.add_argument('input', type=str,
+    parser.add_argument('input', type=str, required=True,
                 help='TODO.')
 
 
-    parser.add_argument('isNeg', type=str,
+    parser.add_argument('isNeg', action='store_true',
                 help='TODO.')
 
 
