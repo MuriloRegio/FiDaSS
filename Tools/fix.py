@@ -2,6 +2,9 @@ import os
 
 
 def main(input_folder, output_folder):
+    if not os.path.exists(output_folder):
+        os.mkdir(output_folder)
+
     for file in os.listdir(input_folder):
         fpath = os.path.join(input_folder, file)
         npath = os.path.join(output_folder, file)
@@ -69,4 +72,4 @@ if __name__ == "__main__":
 
 
     args = parser.parse_args()
-    main(args.input, args.output)
+    main(args.input_folder, args.output_folder)

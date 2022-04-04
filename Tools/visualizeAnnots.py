@@ -123,7 +123,7 @@ def main(inputFolder, annotsFolder, checkpointFile, idxFile):
 				break
 
 	finally:
-		with open(last, 'w') as outfile:
+		with open(idxFile, 'w') as outfile:
 			outfile.write(str(idx))
 
 
@@ -131,29 +131,14 @@ def main(inputFolder, annotsFolder, checkpointFile, idxFile):
 if __name__ == "__main__":
 	import argparse
 
-	parser = argparse.ArgumentParser(description="TODO")
+	parser = argparse.ArgumentParser(description="Tool for quickly verifying amount and positioning of annotations.")
 
 	parser.add_argument('--images', type=str, required=True,
 	            help='Relative path to the folder containing the images.')
 
 
 	parser.add_argument('--labels', type=str, required=True,
-	            help='TODO.')
-
-
-	# parser.add_argument('--idx', type=str,
-	#             help='TODO.')
-
-
-	# parser.add_argument('--checkpoint', type=str,
-	#             help='TODO.')
-
-	# parser.add_argument('--input_path', type=str, required=True,
-	#             help='Relative path to the folder containing the images.')
-
-
-	# parser.add_argument('--output_path', type=str, required=True,
-	#             help='Relative path to the folder where the labels will be written.')
+	            help='Relative path to the folder containing the labels.')
 
 
 	parser.add_argument('--idx', type=str, default='.idx.ckpt',
