@@ -9,7 +9,12 @@ random.seed(42)
 
 
 
-def main(folder, isNeg):
+def main(folder, isNeg, test_pct, val_pct):
+	assert test_pct+val_pct <= 100
+
+	test_pct  = test_pct/100
+	val_pct   = val_pct/100
+
 	if isNeg:
 		files = glob(os.path.join(folder, '*'))
 		key = '_neg'
@@ -42,12 +47,11 @@ def main(folder, isNeg):
 		total += amt
 
 	
-	split_size = int(.15*total)
 	sets = {"test":[], "val":[], "train":[]}
 
 
-	test_left = split_size
-	val_left = split_size
+	test_left = int(total*test_pct)
+	val_left  = int(total*val_pct)
 	train_size = 0
 
 
@@ -91,15 +95,22 @@ def main(folder, isNeg):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="TODO")
+    parser = argparse.ArgumentParser(description="Divides a collection of frames into Train/Test/Validation sets. The tool guarantees that frames of the same video are on the same subset.")
 
-    parser.add_argument('input', type=str, required=True,
-                help='TODO.')
+    parser.add_argument('--input_folder', type=str, required=True,
+                help='Relative path to the folder with the annotations of the dataset, or the images in case of images with no annotations.')
 
 
-    parser.add_argument('isNeg', action='store_true',
-                help='TODO.')
+    parser.add_argument('--isNeg', action='store_true',
+                help='In case the path informed does not contain annotations.')
+
+
+    parser.add_argument('--test_pct', type=float, default=15,
+                help='Percentage of the dataset that should be dedicated for testing.')
+
+    parser.add_argument('--val_pct', type=float, default=15,
+                help='Percentage of the dataset that should be dedicated for validation.')
 
 
     args = parser.parse_args()
-    main(args.input, args.isNeg)
+    main(args.input_folder, args.isNeg, test_pct, val_pct)

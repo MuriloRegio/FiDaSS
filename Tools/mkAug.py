@@ -11,30 +11,17 @@ from data_aug.data_aug import *
 from data_aug.bbox_util import *
 
 
-DIRS = ['./Final/selected_']
-IMG_PATH   = './Final/AUG_IMG'
-ANNOT_PATH = './Final/AUG_ANNOT'
+GET_NAME = lambda x: os.path.basename(os.path.splitext(x)[0])
 
+def explorePath(path):
+	annots = {}
 
-N_TRANSFORMS = {
-	'0' : 3
-}
+	for (dirpath, _, files) in os.walk(path):
+		for file in files:
+			if file.endswith('.txt'):
+				annots[GET_NAME(file)] = os.path.join(dirpath, file)
 
-with open('new_train.txt', 'r') as infile:
-	TRAIN_FILES = [os.path.basename(file) for file in infile.read().split('\n')]
-
-
-for dir in [IMG_PATH, ANNOT_PATH]:
-	if not os.path.exists(dir):
-		os.mkdir(dir)
-
-
-def rotateImage(image, angle):
-	image_center = tuple(np.array(image.shape[1::-1]) / 2)
-	rot_mat = cv2.getRotationMatrix2D(image_center, angle, 1.0)
-	result = cv2.warpAffine(image, rot_mat, image.shape[1::-1], flags=cv2.INTER_LINEAR)
-	return result
-
+	return annots
 
 def voc2box(size, box):
 	dw = size[1]
@@ -118,41 +105,35 @@ def load(path, size):
 	return np.asarray(bbxes), classes
 
 
-def write(name, img, bbs, classes):
-	cv2.imwrite(os.path.join(IMG_PATH, name)+'.png', img)
+def write(name, img, bbs, classes, img_path, annot_path):
+	cv2.imwrite(os.path.join(img_path, name)+'.png', img)
 
 	voc = [
 		' '.join([classes[i]]+[str(x) for x in box2voc(img.shape, bbs[i])])
 		for i in range(len(bbs))
 	]
 
-	with open(os.path.join(ANNOT_PATH, name)+'.txt', 'w') as outfile:
+	with open(os.path.join(annot_path, name)+'.txt', 'w') as outfile:
 		outfile.write('\n'.join(voc))
 
-COUNT = [0]
-def process(directory):
-	img_dir   = directory+'images'
-	annot_dir = directory+'labels'
-	template  = "{}_{}" 
 
-	imgs = os.listdir(img_dir)
-	annots = os.listdir(annot_dir)
+def process(img_paths, labels_path, img_size, img_save_path, label_save_path, TRAIN_FILES, N_TRANSFORMS):
+	template  = "{}_{}"
+
+	imgs = [os.path.join(path,file) for path in img_paths for file in os.listdir(path)]
+	annots_path = explorePath(labels_path)
 
 	for im in imgs:
-		if im not in TRAIN_FILES:
+		name = GET_NAME(im)
+
+		if TRAIN_FILES is not None and name not in TRAIN_FILES:
 			continue
 			
-		name = os.path.splitext(im)[0]
-		label = name + '.txt'
-		#if not os.path.exists(os.path.join(annot_dir, label)):continue
+		img = cv2.imread(im)
+		img = cv2.resize(img, img_size)
 
-		img = cv2.imread(os.path.join(img_dir, im))
-		img = cv2.resize(img,(768, 480))
-		bboxes, classes = load(os.path.join(annot_dir, label), img.shape[:2])
-
-		cs  = classes
-		bbs = bboxes
-		# print(cs)
+		label = annots_path[name]
+		bbs, cs = load(label, img_size)
 
 		data = [(bbs[i], cs[i]) for i in range(len(bbs)) if cs[i] in N_TRANSFORMS and N_TRANSFORMS[cs[i]] > 0]
 
@@ -169,17 +150,13 @@ def process(directory):
 			cs_.append(c)
 
 		bbs_ = np.asarray(bbs_)
-		# total = int(round(total/len(bbs_)))
-		# total = max(total)
 
 		if not len(total):
 			total = N_TRANSFORMS[None]
 		else:
 			total = max(total)
 
-		# print (img.shape, total)
 		j = 0
-
 		for i in range(total):
 			try:
 				img_, nbbs = transform(img, bbs_)
@@ -189,40 +166,61 @@ def process(directory):
 					img_, nbbs = transform(img, bbs_)
 				except:
 					print_exc()
-					COUNT[0] += 1
 					continue
 
 			if len(nbbs) == len(bbs_) and not any([x is None for x in cs_]):
 				j+=1
-				write(template.format(name, i), img_, nbbs, cs_)
+				write(template.format(name, i), img_, nbbs, cs_, img_save_path, label_save_path)
 
 		print (name, j, '(', total, ')')
 
 
+def main(img_paths, labels_path, img_size, img_save_path, label_save_path, train_list, transforms):
+	N_TRANSFORMS = {str(idx):amt for idx, amt in enumerate(transforms)}
 
-def main("TODO"):
-	dirs = [d.replace('images', '').replace('labels', '') for d in DIRS]
-	[process(d) for d in dirs]
-	print (COUNT[0])
+	img_size = tuple(img_size)
+	img_size = (img_size[0],img_size[0]) if len(img_size) == 1 else img_size[:2]
+
+	TRAIN_FILES = None
+	if train_list is not None:
+		with open(train_list, 'r') as infile:
+			TRAIN_FILES = [GET_NAME(file) for file in infile.read().split('\n')]
+
+
+	for dir in [img_save_path, label_save_path]:
+		if not os.path.exists(dir):
+			os.mkdir(dir)
+
+	process(img_paths, labels_path, img_size, img_save_path, label_save_path, TRAIN_FILES, N_TRANSFORMS)
+
+
 
 if __name__ == '__main__':
     import argparse
 
-    parser = argparse.ArgumentParser(description="TODO")
+    parser = argparse.ArgumentParser(description="Tool for creating an augmented train dataset.")
 
-    parser.add_argument('input', type=str, nargs='+',
-                help='TODO.')
+    parser.add_argument('--images_path', type=str, nargs='+', required=True,
+                help='Relative path to the folder containing the train images.')
 
+    parser.add_argument('--labels_path', type=str, required=True,
+                help='Relative path to the directory containing annotations (may be a path to subfolders containing the annotations).')
 
-    parser.add_argument('Ioutput', type=str,
-                help='TODO.')
+    parser.add_argument('--img_size', type=int, nargs='+', default=[512,512],
+                help='Image dimensions of the network input.')
 
-    parser.add_argument('Loutput', type=str,
-                help='TODO.')
+    parser.add_argument('--img_save_path', type=str, required=True,
+                help='Relative path to the folder where the images will be written.')
 
-    parser.add_argument('transforms', type=int, nargs='+',
-                help='TODO.')
+    parser.add_argument('--label_save_path', type=str, required=True,
+                help='Relative path to the folder where the labels will be written.')
+
+    parser.add_argument('--train_list', type=str,
+                help='Txt file containing image path of the train images.')
+
+    parser.add_argument('--transforms', type=int, nargs='+', default=[3],
+                help='Amount of transformations applied for each class. Should be informed by ascending order of the class IDs.')
 
 
     args = parser.parse_args()
-    main(args.input, args.Ioutput, args.Loutput, args.transforms)
+    main(args.images_path, args.labels_path, args.img_size, args.img_save_path, args.label_save_path, args.train_list, args.transforms)

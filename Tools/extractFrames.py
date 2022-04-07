@@ -56,6 +56,6 @@ if __name__ == '__main__':
 	            help='Video extensions to look for within the folder specified.')
 
 	args = parser.parse_args()
-	main(args.video_path, args.frames_path, args.step, args.extensions)
+	main(args.videos_folder, args.frames_path, args.skip, args.extensions)
 	
 	os.system(f'notify-send "Frame extraction complete!"')

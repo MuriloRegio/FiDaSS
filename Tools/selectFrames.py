@@ -107,23 +107,23 @@ def main(inputFolder, outputFolder, checkpointFile, idxFile):
 if __name__ == "__main__":
 	import argparse
 
-	parser = argparse.ArgumentParser(description="TODO")
+	parser = argparse.ArgumentParser(description="Tool for manually choosing frames from the ones extracted.")
 
-	parser.add_argument('input', type=str, required=True,
-	            help='TODO.')
-
-
-	parser.add_argument('output', type=str, required=True,
-	            help='TODO.')
+	parser.add_argument('--frames_path', type=str, required=True,
+	            help='Relative path to the folder containing the frames to be analyzed.')
 
 
-	parser.add_argument('idx', type=str,
-	            help='TODO.')
+	parser.add_argument('--output_folder', type=str, required=True,
+	            help='Relative path to the folder where the frames will be saved.')
 
 
-	parser.add_argument('checkpoint', type=str,
-	            help='TODO.')
+	parser.add_argument('--idx', type=str, default='.idx.ckpt',
+	            help='File to write the last file analyzed, for continued usage after closing the application.')
+
+
+	parser.add_argument('--checkpoint', type=str, default='.checkpoint.ckpt',
+	            help='File to write the checkpoint list, for continued usage after closing the application.')
 
 
 	args = parser.parse_args()
-	main(args.input, args.output, args.checkpoint, args.idx)
+	main(args.frames_path, args.output_folder, args.checkpoint, args.idx)
