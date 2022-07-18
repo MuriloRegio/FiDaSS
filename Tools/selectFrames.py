@@ -1,4 +1,5 @@
 import shutil as sh
+import pickle
 import cv2
 import os
 
@@ -68,7 +69,7 @@ def main(inputFolder, outputFolder, checkpointFile, idxFile):
 	while True:
 		img = cv2.imread(os.path.join(inputFolder, frames[idx]))
 		# img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-		cv2.imshow('img', cv2.resize(img, SHAPE))
+		cv2.imshow('img', cv2.resize(img, disp_size))
 		#print(frames[idx], end='\r')
 		print('{1:06d}/{0:06d}'.format(amt, idx), end='\r')
 

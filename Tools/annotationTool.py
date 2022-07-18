@@ -219,13 +219,13 @@ def main(inputFolder, outputFolder, checkpointFile, idxFile):
 			points = []
 			
 
-		if key == last_key:
-			momentum = min(momentum+1,100)
-			if   momentum >= 100: idx+=19*mod
-			elif momentum >=  50: idx+=9*mod
-			elif momentum >=  25: idx+=4*mod
-		else:
-			momentum = 0
+		# if key == last_key: ### TODO:: FIX THIS
+		# 	momentum = min(momentum+1,100)
+		# 	if   momentum >= 100: idx+=19*mod
+		# 	elif momentum >=  50: idx+=9*mod
+		# 	elif momentum >=  25: idx+=4*mod
+		# else:
+		# 	momentum = 0
 		last_key = key
 
 	print()
